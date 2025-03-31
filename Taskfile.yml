@@ -1,0 +1,22 @@
+version: "3"
+
+tasks:
+  start:
+    cmds:
+      - encore run
+  gen-new-schema:
+    cmds:
+      - go run entgo.io/ent/cmd/ent@latest new --target api/ent/schema {{.CLI_ARGS}}
+  gen-ent:
+    cmds:
+      - go run entgo.io/ent/cmd/ent@latest generate --feature sql/upsert,intercept,schema/snapshot ./api/ent/schema
+  gen-migration:
+    dir: "{{.USER_WORKING_DIR}}/api"
+    cmds:
+      - sh ./scripts/generate-migration.sh {{.CLI_ARGS}}
+  db-reset:
+    cmds:
+      - encore db reset --all
+  db-shell:
+    cmds:
+      - encore db shell api
