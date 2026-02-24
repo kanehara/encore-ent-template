@@ -1,4 +1,4 @@
-// Service api manages the core trash finder API.
+// Service api is the core API service.
 package api
 
 import (
@@ -23,9 +23,9 @@ func initService() (*Service, error) {
 	}, nil
 }
 
-// Define a database named 'api', using the database
-// migrations  in the "./migrations" folder.
-// Encore provisions, migrates, and connects to the database.
+// Define a database named 'api', using the database migrations in the
+// "./migrations" folder. Encore provisions, migrates, and connects to
+// the database automatically on startup.
 // Learn more: https://encore.dev/docs/primitives/databases
 var db = sqldb.NewDatabase("api", sqldb.DatabaseConfig{
 	Migrations: "./migrations",

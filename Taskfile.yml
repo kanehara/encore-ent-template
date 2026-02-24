@@ -1,22 +1,59 @@
 version: "3"
 
 tasks:
+  # ── App lifecycle ──────────────────────────────────────────────────────────
+
   start:
+    desc: "Start the Encore development server (auto-applies migrations on boot)"
     cmds:
       - encore run
-  gen-new-schema:
+
+  # ── Code generation ────────────────────────────────────────────────────────
+
+  gen:
+    desc: "Run all code generators (ent client + any //go:generate directives)"
     cmds:
-      - go run entgo.io/ent/cmd/ent@latest new --target api/ent/schema {{.CLI_ARGS}}
+      - go generate ./...
+
   gen-ent:
+    desc: "Regenerate the ent client from schema changes (alias for 'task gen')"
     cmds:
-      - go run entgo.io/ent/cmd/ent@latest generate --feature sql/upsert,intercept,schema/snapshot ./api/ent/schema
+      - go generate ./api/ent/...
+
+  gen-new-schema:
+    desc: "Scaffold a new ent schema file. Usage: task gen-new-schema -- MyEntity"
+    cmds:
+      - go run entgo.io/ent/cmd/ent new --target api/ent/schema {{.CLI_ARGS}}
+
+  # ── Migrations ────────────────────────────────────────────────────────────
+
   gen-migration:
+    desc: "Generate a new Atlas migration from schema diff. Usage: task gen-migration -- add_email_to_users"
     dir: "{{.USER_WORKING_DIR}}/api"
     cmds:
       - sh ./scripts/generate-migration.sh {{.CLI_ARGS}}
+
+  # ── Database utilities ────────────────────────────────────────────────────
+
   db-reset:
+    desc: "Drop and recreate all databases (destructive – development only)"
     cmds:
       - encore db reset --all
+
   db-shell:
+    desc: "Open a psql shell on the 'api' database"
     cmds:
       - encore db shell api
+
+  # ── Dependency management ─────────────────────────────────────────────────
+
+  tidy:
+    desc: "Run go mod tidy to sync go.mod / go.sum"
+    cmds:
+      - go mod tidy
+
+  update-deps:
+    desc: "Interactively upgrade all direct dependencies to their latest versions"
+    cmds:
+      - go get -u ./...
+      - go mod tidy
